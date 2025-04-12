@@ -13,7 +13,7 @@ IMAGE_SIZE = 255
 CHANNEL = 3
 EPOCHS = 20
 
-class_names = ['Potato___Early_blight', 'Potato___Late_blight', 'Potato___healthy']
+labels = ['Potato___Early_blight', 'Potato___Late_blight', 'Potato___healthy']
 
 model = tf.keras.models.load_model('./model/model.h5')
 
@@ -21,16 +21,19 @@ model = tf.keras.models.load_model('./model/model.h5')
 def validate_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg'}
 
-def predict(img):
-    # chuyển ảnh đơn lẽ (h, w, rgb) sang (batch_size, h, w, rgb) (tính theo batch_size (nhiều ảnh))
-    array_input = tf.keras.preprocessing.image.img_to_array(img) # 1D
-    array_input = tf.expand_dims(array_input, 0)   # thêm chiều
+def prepare_input(img_tf):
+    img_tf = tf.keras.preprocessing.image.img_to_array(img_tf)
+    print(img_tf.shape)
+    F_predict = tf.expand_dims(img_tf, 0)
+    
+    return F_predict
 
-    y_predicted = model.predict(array_input) # return 2D
+def predict(F_predict):
+    y_predicted = model.predict(F_predict) # return 2D
+    
+    predicted_label = labels[np.argmax(y_predicted[0])]  # lấy chỉ mục của giá trị lớn nhất
 
-    predicted_label = class_names[np.argmax(y_predicted[0])]  # lấy chỉ mục của giá trị lớn nhất
-
-    predicted_score = round(100 * (np.max(y_predicted[0])), 2) # chuyển về %
+    predicted_score = round(np.max(y_predicted[0]) * 100, 2)
 
     return [predicted_label, predicted_score]
 
@@ -53,8 +56,10 @@ def index():
 
             # Read the image
             img_tf = tf.keras.preprocessing.image.load_img(filepath, target_size=(IMAGE_SIZE, IMAGE_SIZE))
+            
+            F_predict = prepare_input(img_tf)
 
-            predicted_label, predicted_score = predict(img_tf)
+            predicted_label, predicted_score = predict(F_predict)
 
             return render_template('index.html', image_path=filepath, actual_label=predicted_label, predicted_label=predicted_label, predicted_score=predicted_score)
     
