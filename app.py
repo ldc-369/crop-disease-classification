@@ -21,6 +21,13 @@ def validate_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg'}
 
 def prepare_input(img_tf):
+    # C1:
+    # img = tf.keras.utils.load_img("path/to/image.jpg")
+    # img = tf.keras.utils.img_to_array(img)  # thành mảng NumPy
+    # image_tf = tf.convert_to_tensor(image_np)  # image_np: img dạng mảng
+    # image_tf = tf.image.convert_image_dtype(image_tf, tf.float32)
+    # img = tf.expand_dims(img, axis=0)       # thêm batch dimension: (1, H, W, C)
+    
     img_tf = tf.keras.preprocessing.image.img_to_array(img_tf)
     print(img_tf.shape)
     
@@ -56,8 +63,6 @@ def index():
             file.save(filepath)  # lưu file
 
             # Read the image
-            # image_tf = tf.convert_to_tensor(image_np)  # image_np: img dạng mảng
-            # image_tf = tf.image.convert_image_dtype(image_tf, tf.float32)
             img_tf = tf.keras.preprocessing.image.load_img(filepath, target_size=(IMAGE_SIZE, IMAGE_SIZE))
             
             F_predict = prepare_input(img_tf)
