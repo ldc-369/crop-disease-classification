@@ -1,9 +1,8 @@
 from flask import Flask, render_template, request
 from werkzeug.utils import secure_filename
 import os
-from tensorflow import expand_dims, convert_to_tensor
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing.image import load_img, img_to_array
+import tensorflow as tf
+import tensorflow.keras as ks
 import numpy as np
 
 
@@ -16,19 +15,19 @@ CHANNEL = 3
 
 labels = ['Potato___Early_blight', 'Potato___Late_blight', 'Potato___healthy']
 
-model = load_model('./crop-disease-classification/model/model.h5')
+model = ks.models.load_model('./crop-disease-classification/model/model.h5')
 
 def validate_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg'}
 
 def prepare_input(filepath):
-    img_PIL = load_img(filepath, target_size=(IMAGE_SIZE, IMAGE_SIZE))  # load and resize
+    img_PIL = ks.preprocessing.image.load_img(filepath, target_size=(IMAGE_SIZE, IMAGE_SIZE))  # load and resize
     
     # img_tf = tf.image.convert_image_dtype(img_tf, tf.float32)   # convert_image_dtype() tư động scale
-    img_arr = img_to_array(img_PIL)   # 3D (h, w, rgb)
+    img_arr = ks.preprocessing.image.img_to_array(img_PIL)   # 3D (h, w, rgb)
     
-    img_arr = expand_dims(img_arr, axis=0)  # 4D (batch_size, h, w, rgb)
-    F_predict = convert_to_tensor(img_arr)
+    img_arr = tf.expand_dims(img_arr, axis=0)  # 4D (batch_size, h, w, rgb)
+    F_predict = tf.convert_to_tensor(img_arr)
     
     return F_predict
 
