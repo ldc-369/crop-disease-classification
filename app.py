@@ -56,6 +56,8 @@ def index():
             file.save(filepath)  # lưu file
 
             # Read the image
+            # image_tf = tf.convert_to_tensor(image_np)  # image_np: img dạng mảng
+            # image_tf = tf.image.convert_image_dtype(image_tf, tf.float32)
             img_tf = tf.keras.preprocessing.image.load_img(filepath, target_size=(IMAGE_SIZE, IMAGE_SIZE))
             
             F_predict = prepare_input(img_tf)
