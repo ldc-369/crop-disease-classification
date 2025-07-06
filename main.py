@@ -27,7 +27,7 @@ def prepare_input(file_paths):
         PIL_img = load_img(file_path, target_size=(IMAGE_SIZE, IMAGE_SIZE)) # load and resize
         
         img_arr = img_to_array(PIL_img) / 255.0  # scale pixel về [0, 1]
-        img_arr = img_arr.astype("float32")
+        # img_arr = img_arr.astype("float32")
         
         X_predict = np.concatenate((X_predict, np.expand_dims(img_arr, axis=0)), axis=0)[1:] # 4D (batch_size, H, W, C)
     
